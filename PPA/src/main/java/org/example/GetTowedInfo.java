@@ -27,28 +27,32 @@ public class GetTowedInfo {
         conn.setRequestMethod("GET");
         conn.connect();
 
-        //READ BODY
-        BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
-        StringBuilder sb = new StringBuilder();
-        String output;
-        while ((output = br.readLine()) != null) {
-            sb.append(output);
-        }
 
-        sb = new StringBuilder(sb.substring(1, sb.length() - 1));
+            //READ BODY
+            BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+            StringBuilder sb = new StringBuilder();
+            String output;
+            while ((output = br.readLine()) != null) {
+                sb.append(output);
+            }
 
-
-        //PARSE TO JSON
-        JSONParser parser = new JSONParser();
-        JSONObject json = (JSONObject) parser.parse(String.valueOf(sb));
+            sb = new StringBuilder(sb.substring(1, sb.length() - 1));
 
 
-        HashMap<String, String> map = new HashMap<>();
-        map.put("License", String.valueOf(json.get("LicensePlate")));
-        map.put("StorageLotAddress", String.valueOf(json.get("StorageLotAddress")));
-        map.put("TowedDate", String.valueOf(json.get("TowedDate")));
+            //if valid response (car towed)
+            if(sb.length()>10) {
+                //PARSE TO JSON
+                JSONParser parser = new JSONParser();
+                JSONObject json = (JSONObject) parser.parse(String.valueOf(sb));
+
+                HashMap<String, String> map = new HashMap<>();
+                map.put("License", String.valueOf(json.get("LicensePlate")));
+                map.put("StorageLotAddress", String.valueOf(json.get("StorageLotAddress")));
+                map.put("TowedDate", String.valueOf(json.get("TowedDate")));
+
+                return map;
+            } else return null;
 
 
-        return map;
 
 }}

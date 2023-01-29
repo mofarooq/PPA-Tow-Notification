@@ -25,6 +25,7 @@ import java.io.*;
 import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -44,20 +45,42 @@ public class GMailer {
     public static void main(String[] args) throws GeneralSecurityException, IOException, MessagingException, ParseException {
         GetTowedInfo connection = new GetTowedInfo();
 
-        HashMap<String, String> obj = connection.creator("llz3588");
+        HashMap<String, String> userInfo = new HashMap<>();
+        userInfo.put("smrsmr0502@gmail.com", "llz3588");
+        userInfo.put("moonlyf3@gmail.com", "ll3588");
 
-        new GMailer().sendMail("YOUR CAR HAS BEEN TOWED", "If you are receiving this message, your car has been towed."
+
+        for (String key: userInfo.keySet()) {
+
+            HashMap<String, String> carInfo = connection.creator(userInfo.get(key));
+
+
+            if (carInfo != null) {
+                new GMailer().sendMail("YOUR CAR HAS BEEN TOWED",
+                        "If you are receiving this message, your car has been towed."
                         + "Your car with license plate: "
-                        +obj.get("LicensePlate")
-                        +" has been towed."
-                        +" You can find it at "
-                        +obj.get("StorageLotAddress")
-                        +" and you can call the tow lot directly using "
-                        +obj.get("Phone"));
+                        + carInfo.get("LicensePlate")
+                        + " has been towed."
+                        + " You can find it at "
+                        + carInfo.get("StorageLotAddress")
+                        + " and you can call the tow lot directly using "
+                        + carInfo.get("Phone"),
+                        key);
+            } else {
+                continue;
+            }
+
+        }
+
+
+
+
+
+
 
     }
 
-    private void sendMail(String subject, String message) throws GeneralSecurityException, IOException, MessagingException {
+    private void sendMail(String subject, String message, String emailAddress) throws GeneralSecurityException, IOException, MessagingException {
 
 
         // Encode as MIME message
@@ -66,7 +89,7 @@ public class GMailer {
         MimeMessage email = new MimeMessage(session);
         email.setFrom(new InternetAddress("yourcaristowed@gmail.com"));
         email.addRecipient(javax.mail.Message.RecipientType.TO,
-                new InternetAddress("smrsmr0502@gmail.com"));
+                new InternetAddress(emailAddress));
         email.setSubject(subject);
         email.setText(message);
 
