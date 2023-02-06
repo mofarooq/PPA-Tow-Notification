@@ -14,6 +14,8 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.GmailScopes;
 import com.google.api.services.gmail.model.Message;
+import com.google.api.services.sheets.v4.Sheets;
+import com.google.api.services.sheets.v4.SheetsScopes;
 import org.apache.commons.codec.binary.Base64;
 import org.json.simple.parser.ParseException;
 
@@ -24,62 +26,73 @@ import javax.mail.internet.MimeMessage;
 import java.io.*;
 import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 public class GMailer {
 
-    private final Gmail service;
+    private final Gmail gmailService;
+    private static Sheets sheetsService;
+    private final String spreadsheetId = "16HD4S0ZHSVi3k-Vz75tyiPaRS9gV7kUmi9BTku97yOg";
 
     public GMailer() throws GeneralSecurityException, IOException {
         NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
         GsonFactory jsonFactory = GsonFactory.getDefaultInstance();
 
-        service = new Gmail.Builder(HTTP_TRANSPORT, jsonFactory, getCredentials(HTTP_TRANSPORT, jsonFactory))
+        gmailService = new Gmail.Builder(HTTP_TRANSPORT, jsonFactory, getCredentials(HTTP_TRANSPORT, jsonFactory))
                 .setApplicationName("PPA TOWED")
                 .build();
+
+        sheetsService =
+                new Sheets.Builder(HTTP_TRANSPORT, jsonFactory, getCredentials(HTTP_TRANSPORT, jsonFactory))
+                        .setApplicationName("PPA TOWED")
+                        .build();
     }
+
+
 
     public static void main(String[] args) throws GeneralSecurityException, IOException, MessagingException, ParseException {
         GetTowedInfo connection = new GetTowedInfo();
+        GMailer service = new GMailer();
 
-        HashMap<String, String> userInfo = new HashMap<>();
-        userInfo.put("smrsmr0502@gmail.com", "llz3588");
-        userInfo.put("moonlyf3@gmail.com", "ll3588");
-
+        HashMap<String, String> userInfo = service.readSheet();
 
         for (String key: userInfo.keySet()) {
-
-            HashMap<String, String> carInfo = connection.creator(userInfo.get(key));
-
+            System.out.println("YYY" + key);
+            HashMap<String, String> carInfo = connection.creator(key);
 
             if (carInfo != null) {
-                new GMailer().sendMail("YOUR CAR HAS BEEN TOWED",
-                        "If you are receiving this message, your car has been towed."
-                        + "Your car with license plate: "
-                        + carInfo.get("LicensePlate")
-                        + " has been towed."
-                        + " You can find it at "
+                service.sendMail("YOUR CAR HAS BEEN TOWED",
+                        "If you are receiving this message, your car has been towed. "
+                        + "Your car with license plate "
+                        + carInfo.get("License")
+                        + " has been towed to "
                         + carInfo.get("StorageLotAddress")
-                        + " and you can call the tow lot directly using "
-                        + carInfo.get("Phone"),
-                        key);
+                        + " "
+                        + carInfo.get("StorageLocation")
+                        + ". "
+                        + "It was towed at "
+                        + carInfo.get("TowedDate")
+                        + ". "
+                        + "The number to the tow lot is "
+                        + carInfo.get("Phone")
+                        +".",
+                        userInfo.get(key));
             } else {
                 continue;
             }
 
         }
-
-
-
-
-
-
-
     }
 
+    /**
+     * If car is towed, send email to appropriate email
+     * @param subject
+     * @param message
+     * @param emailAddress
+     * @throws GeneralSecurityException
+     * @throws IOException
+     * @throws MessagingException
+     */
     private void sendMail(String subject, String message, String emailAddress) throws GeneralSecurityException, IOException, MessagingException {
 
 
@@ -87,7 +100,7 @@ public class GMailer {
         Properties props = new Properties();
         Session session = Session.getDefaultInstance(props, null);
         MimeMessage email = new MimeMessage(session);
-        email.setFrom(new InternetAddress("yourcaristowed@gmail.com"));
+        email.setFrom(new InternetAddress("yourcargotowed@gmail.com"));
         email.addRecipient(javax.mail.Message.RecipientType.TO,
                 new InternetAddress(emailAddress));
         email.setSubject(subject);
@@ -105,7 +118,7 @@ public class GMailer {
 
         try {
             // Create send message
-            msg = service.users().messages().send("me", msg).execute();
+            msg = gmailService.users().messages().send("me", msg).execute();
             System.out.println("Message id: " + msg.getId());
             System.out.println(msg.toPrettyString());
         } catch (GoogleJsonResponseException e) {
@@ -120,13 +133,57 @@ public class GMailer {
 
     }
 
+    /**
+     *
+     * @return hashmap of all license plate, email key-value pairs in Excel Sheet for Google Forms Responses
+     * @throws IOException
+     */
+    public HashMap<String, String> readSheet() throws IOException {
+        String sheetName = "Form Responses 1!";
+
+        List<List<Object>> readResult = sheetsService.spreadsheets().values()
+                .get(spreadsheetId, sheetName + "B2:C1000")
+                .execute()
+                .getValues();
+
+        String[][] array = new String[readResult.size()][];
+
+        int i = 0;
+        for (List<Object> row : readResult) {
+            array[i++] = row.toArray(new String[row.size()]);
+        }
+
+        HashMap<String, String> userInfo = new HashMap<>();
+
+        for(int y=0;y<array.length;y++) {
+            String str = Arrays.deepToString(array[y]);
+            String[] arrOfStr = str.split(",", -1);
+            arrOfStr[0] = arrOfStr[0].substring(1, arrOfStr[0].length());
+            arrOfStr[1] = arrOfStr[1].trim().substring(0,arrOfStr[1].length()-2);
+
+            System.out.println("XXX"+arrOfStr[0]+arrOfStr[1]);
+
+            userInfo.put(arrOfStr[0], arrOfStr[1]);
+        }
 
 
+        //KEY IS LICENSE PLATE
+        //VALUE IS EMAIL
+        return userInfo;
+    }
 
+
+    /**
+     *
+     * @param httpTransport
+     * @param jsonFactory
+     * @return Oauth credentials for accessing Google APIs
+     * @throws IOException
+     */
     private static Credential getCredentials(final NetHttpTransport httpTransport, GsonFactory jsonFactory)
             throws IOException {
         // Load client secrets.
-        InputStream in = GMailer.class.getResourceAsStream("/client_secret_845312463343-b6os9dq26db8ct68t6scs43dlruilkss.apps.googleusercontent.com.json");
+        InputStream in = GMailer.class.getResourceAsStream("/credentials.json");
         if (in == null) {
             throw new FileNotFoundException("Resource not found: ");
         }
@@ -135,7 +192,7 @@ public class GMailer {
 
         // Build flow and trigger user authorization request.
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
-                httpTransport, jsonFactory, clientSecrets, Set.of(GmailScopes.GMAIL_SEND))
+                httpTransport, jsonFactory, clientSecrets, List.of(GmailScopes.GMAIL_SEND, SheetsScopes.SPREADSHEETS))
                 .setDataStoreFactory(new FileDataStoreFactory(Paths.get("tokens").toFile()))
                 .setAccessType("offline")
                 .build();
