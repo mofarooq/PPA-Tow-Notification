@@ -12,11 +12,21 @@ import java.net.URL;
 import java.util.HashMap;
 
 
+
 public class GetTowedInfo {
 
     public GetTowedInfo() {
 
     }
+
+    /**
+     *
+     * @param licensePlate retrieved from Google sheets
+     * @return hashmap of important information about car and tow location
+     * if car is towed.
+     * @throws IOException
+     * @throws ParseException
+     */
     public HashMap<String, String> creator(String licensePlate) throws IOException, ParseException {
 
         //ESTABLISH CONNECTION
@@ -53,9 +63,6 @@ public class GetTowedInfo {
             map.put("Phone", String.valueOf(json.get("Phone")));
             map.put("TowedFrom", String.valueOf(json.get("towed_Street_name")));
 
-            System.out.println(json);
-
-            System.out.println(map);
             return map;
         } else return null;
 }}
