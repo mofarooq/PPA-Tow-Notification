@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 
@@ -48,14 +49,14 @@ public class GetTowedInfo {
 
         sb = new StringBuilder(sb.substring(1, sb.length() - 1));
 
-
+        HashMap<String, String> map = new HashMap<>();
         //if valid response (car towed) create hashmap of important values and return it
         if(sb.length()>10) {
             //PARSE TO JSON
             JSONParser parser = new JSONParser();
             JSONObject json = (JSONObject) parser.parse(String.valueOf(sb));
 
-            HashMap<String, String> map = new HashMap<>();
+
             map.put("License", String.valueOf(json.get("LicensePlate")));
             map.put("StorageLotAddress", String.valueOf(json.get("StorageLotAddress")));
             map.put("StorageLocation", String.valueOf(json.get("StorageLocation")));
@@ -65,4 +66,23 @@ public class GetTowedInfo {
 
             return map;
         } else return null;
-}}
+
+    }
+        public void verifyNumber() throws IOException {
+            URL url = new URL("https://api.apilayer.com/number_verification/validate?number=6464070224");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestProperty("apikey", "dnDm5lF9TIXgurlAHv35659ALCb2029h");
+            conn.setRequestMethod("GET");
+            conn.connect();
+
+
+
+            BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+            StringBuilder sb = new StringBuilder();
+            String output;
+            while ((output = br.readLine()) != null) {
+                sb.append(output);
+            }
+
+        }
+}
