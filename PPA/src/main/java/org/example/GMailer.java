@@ -16,9 +16,6 @@ import com.google.api.services.gmail.GmailScopes;
 import com.google.api.services.gmail.model.Message;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
-import com.google.api.services.sheets.v4.model.BatchUpdateValuesRequest;
-import com.google.api.services.sheets.v4.model.BatchUpdateValuesResponse;
-import com.google.api.services.sheets.v4.model.ValueRange;
 import org.apache.commons.codec.binary.Base64;
 import org.json.simple.parser.ParseException;
 
@@ -29,17 +26,15 @@ import javax.mail.internet.MimeMessage;
 import java.io.*;
 import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 
-
 public class GMailer {
-
     public final Gmail gmailService;
     private static Sheets sheetsService;
     private final String spreadsheetId = "16HD4S0ZHSVi3k-Vz75tyiPaRS9gV7kUmi9BTku97yOg";
-
     public static HashMap<String, Boolean> emailSent = new HashMap<String, Boolean>();
-
 
     public GMailer() throws GeneralSecurityException, IOException {
         NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
@@ -54,26 +49,34 @@ public class GMailer {
                         .setApplicationName("PPA TOWED")
                         .build();
     }
+    public static void main(String[] args) throws SQLException {
+
+        SqlNinja sqlNinja = new SqlNinja();
+        ResultSet resultSet = sqlNinja.userSet();
+
+        while (resultSet.next()) {
+            // Retrieve data from the result set
+            int id = resultSet.getInt("id");
+            String name = resultSet.getString("name");
+            String email = resultSet.getString("email");
+            String license = resultSet.getString("license");
+            String firstEmail = resultSet.getString("firstEmail");
 
 
+            // Do something with the retrieved data
+            System.out.println("ID: " + id + ", Name: " + name + ", Email: " + email+ ", License: " + license+ ", FirstEmailSent: " + firstEmail);
+            System.out.println(resultSet);
 
-    public static void main(String[] args) throws GeneralSecurityException, IOException, MessagingException, ParseException {
-
-
+        }
        //run on timed schedule
-
         Timer timer = new Timer();
-
         Timer timer2 = new Timer();
-
         timer2.schedule(new TimerTask() {
             public void run() {
                 GMailer service;
                 try {
                     service = new GMailer();
-                } catch (GeneralSecurityException e) {
-                    throw new RuntimeException(e);
-                } catch (IOException e) {
+                } catch (GeneralSecurityException | IOException e) {
                     throw new RuntimeException(e);
                 }
 
@@ -89,8 +92,7 @@ public class GMailer {
                     emailSent.put(userInfo.get(key), false);
                 }
                 System.out.println("RESET" + emailSent);
-            }
-                       }, 0, 30000);
+            }}, 0, 30000);
 
         timer.schedule(new TimerTask() {
 
@@ -101,9 +103,7 @@ public class GMailer {
                 GMailer service;
                 try {
                     service = new GMailer();
-                } catch (GeneralSecurityException e) {
-                    throw new RuntimeException(e);
-                } catch (IOException e) {
+                } catch (GeneralSecurityException | IOException e) {
                     throw new RuntimeException(e);
                 }
 
@@ -120,14 +120,12 @@ public class GMailer {
                     HashMap<String, String> carInfo;
                     try {
                         carInfo = connection.creator(key);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    } catch (ParseException e) {
+                    } catch (IOException | ParseException e) {
                         throw new RuntimeException(e);
                     }
 
                     String email = userInfo.get(key);
-                    if (carInfo != null && emailSent.get(email) == false) {
+                    if (carInfo != null && !emailSent.get(email)) {
                         try {
                             service.sendMail("YOUR CAR HAS BEEN TOWED",
                                     "If you are receiving this message, your car has been towed."
@@ -147,26 +145,13 @@ public class GMailer {
                                     email,
                                     carInfo.get("License"));
 
-                        } catch (GeneralSecurityException e) {
-                            throw new RuntimeException(e);
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        } catch (MessagingException e) {
+                        } catch (GeneralSecurityException | IOException | MessagingException e) {
                             throw new RuntimeException(e);
                         }
-                        emailSent.put(email, true);
-                    }
-
-
-                }
+                        emailSent.put(email, true);}}
                 System.out.println("EMAIL" + emailSent);
 
             }}, 0, 10000);
-
-
-
-
-
     }
 
     /**
@@ -236,11 +221,11 @@ public class GMailer {
         HashMap<String, String> userInfo = new HashMap<>();
 
         //clean up
-        for(int y=0;y<array.length;y++) {
-            String str = Arrays.deepToString(array[y]);
+        for (String[] strings : array) {
+            String str = Arrays.deepToString(strings);
             String[] arrOfStr = str.split(",", -1);
-            arrOfStr[0] = arrOfStr[0].substring(1, arrOfStr[0].length());
-            arrOfStr[1] = arrOfStr[1].trim().substring(0,arrOfStr[1].length()-2);
+            arrOfStr[0] = arrOfStr[0].substring(1);
+            arrOfStr[1] = arrOfStr[1].trim().substring(0, arrOfStr[1].length() - 2);
             userInfo.put(arrOfStr[0], arrOfStr[1]);
         }
 
@@ -248,37 +233,6 @@ public class GMailer {
         //VALUE IS EMAIL
         return userInfo;
     }
-
-    public String[][] readSheet2() throws IOException {
-        String sheetName = "Form Responses 1!";
-
-        List<List<Object>> readResult = sheetsService.spreadsheets().values()
-                .get(spreadsheetId, sheetName + "D2:D8")
-                .execute()
-                .getValues();
-
-        String[][] array = new String[readResult.size()][];
-        int i = 0;
-        for (List<Object> row : readResult) {
-            array[i++] = row.toArray(new String[row.size()]);
-        }
-
-
-//        System.out.println(array[0][0]);
-//        System.out.println(array[1][0]);
-//        System.out.println(array[2][0]);
-//        System.out.println(array[3][0]);
-
-        return array;
-    }
-
-    //USE index of userInfo hashmap to write to google sheet, column D, flag of true
-    public void writeSheet() throws IOException {
-
-
-        System.out.println(emailSent);
-    }
-
 
     /**
      *
@@ -308,5 +262,4 @@ public class GMailer {
         //returns an authorized Credential object.
         return credential;
     }
-
 }
