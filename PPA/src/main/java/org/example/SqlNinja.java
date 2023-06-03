@@ -4,7 +4,7 @@ import java.sql.*;
 public class SqlNinja {
 
 
-    public ResultSet userSet() {
+    public ResultSet userSet()  {
         // AWS RDS database connection parameters
         String url = "jdbc:mysql://ppa-database-1.czkjwcsnqzk1.us-east-2.rds.amazonaws.com/PPA";
         String username = "admin";
