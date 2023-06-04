@@ -1,12 +1,19 @@
 package org.example;
+import java.util.HashMap;
 import java.util.Properties;
 import javax.mail.*;
 import javax.mail.internet.*;
 
 
 public class Email {
+    private String email;
+    private String message;
 
-    public static void main(String[] args) {
+    public Email() {
+
+    };
+
+    public void sendEmail(String email, String message) {
 
         // Outgoing SMTP server properties
         String host = "mail.ihatetheppa.com";
@@ -16,11 +23,10 @@ public class Email {
 
         // Sender and recipient details
         String from = "mfarooq@ihatetheppa.com";
-        String to = "smrsmr0502@gmail.com";
+        String to = email;
 
         // Email content
         String subject = "Subject of the email";
-        String message = "Content of the email";
 
         // Set the host and authentication properties
         Properties properties = new Properties();
