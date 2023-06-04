@@ -2,11 +2,12 @@ package org.example;
 
 public class MessageComposer {
 
-    public String composeMessage(String name, String license, String storageLotAddress, String storageLocation, String towedDate, String phone) {
+    public String carTowedMessage(String name, String license, String storageLotAddress, String storageLocation, String towedDate, String phone) {
 
-        String message =        "Dear, "
+        String message =        "Dear "
                                 + name
-                                + " If you are receiving this message, your car has been towed."
+                                +", \n"
+                                + "If you are receiving this message, your car has been towed."
                                 + " Your car with license plate "
                                 + license
                                 + " has been towed to "

@@ -27,7 +27,7 @@ public class Main {
                     String name = resultSet.getString("name");
                     String email = resultSet.getString("email");
                     String license = resultSet.getString("license");
-                    String firstEmail = resultSet.getString("firstEmail");
+                    Boolean firstEmail = resultSet.getBoolean("firstEmail");
 
                     HashMap<String, String> carInfo;
 
@@ -36,11 +36,21 @@ public class Main {
 
                     carInfo = connection.creator(license);
 
-                    String message = messageComposer.composeMessage
-                            (name, carInfo.get("License"), carInfo.get("StorageLotAddress"), carInfo.get("StorageLocation")
-                            ,carInfo.get("TowedDate"), carInfo.get("Phone"));
+
+//                    String message = messageComposer.carTowedMessage
+//                            (name, carInfo.get("License"), carInfo.get("StorageLotAddress"), carInfo.get("StorageLocation")
+//                            ,carInfo.get("TowedDate"), carInfo.get("Phone"));
+
+                    String fakeMessage = messageComposer.carTowedMessage
+                            (name, "c", "d", "e"
+                                    ,"f", "g");
+
+                    if (firstEmail = false) {
+                        //send sign up email String signup = messageComposer.signUpEmali();
+                        //emailSender.sendEmail(email, signup);
+                    }
 
                     if (email.equals("smrsmr0502@gmail.com")) {  //if (!carinfo = null))
                         System.out.println("HIT");
-                        emailSender.sendEmail(email, message);
+                        emailSender.sendEmail(email, fakeMessage);
                         }}}}
