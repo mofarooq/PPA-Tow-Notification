@@ -9,26 +9,19 @@ public class Email {
     public Email() {
 
     };
-
     public void sendEmail(String email, String message) {
-
-        // Outgoing SMTP server properties
-        String host = Credentials.EMAIL_HOST;
-        int port = Credentials.EMAIL_PORT;
-        String username = Credentials.EMAIL_USERNAME;
-        String password = Credentials.EMAIL_PASSWORD;
 
         // Sender and recipient details
         String from = "mfarooq@ihatetheppa.com";
         String to = email;
 
         // Email content
-        String subject = "Subject of the email";
+        String subject = "Your Car Has Been Towed!";
 
         // Set the host and authentication properties
         Properties properties = new Properties();
-        properties.put("mail.smtp.host", host);
-        properties.put("mail.smtp.port", port);
+        properties.put("mail.smtp.host", Credentials.EMAIL_HOST);
+        properties.put("mail.smtp.port", Credentials.EMAIL_PORT);
         properties.put("mail.smtp.auth", "true");
         properties.put("mail.smtp.starttls.enable", "true");
         properties.put("mail.smtp.ssl.enable", "true");
@@ -36,7 +29,7 @@ public class Email {
         // Create a session with authentication
         Session session = Session.getInstance(properties, new Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(username, password);
+                return new PasswordAuthentication(Credentials.EMAIL_USERNAME, Credentials.EMAIL_PASSWORD);
             }
         });
 
@@ -50,7 +43,7 @@ public class Email {
             mimeMessage.setSubject(subject);
             mimeMessage.setText(message);
 
-            session.setDebug(true);
+            session.setDebug(false);
 
             // Send the email
             Transport.send(mimeMessage);
