@@ -46,6 +46,7 @@ public class Main {
                         emailSender.sendEmail(email, "SIGN UP EMAIL");
                         twilioSMS.sendMessage(phone, "SIGN UP TEXT");
                         System.out.println("MESSAGE SENT TO" + phone);
+                        sqlNinja.updateFirstEmail(id);
                     }
 
                     if (email.equals("smrsmr0502@gmail.com")) {  //if (!carinfo = null))

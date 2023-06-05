@@ -2,8 +2,9 @@ package org.example;
 import java.sql.*;
 
 public class SqlNinja {
-    public ResultSet userSet()  {
 
+    public final String jdbcUrl = "com.mysql.cj.jdbc.Driver";
+    public ResultSet userSet()  {
         // SQL query to execute
         String query = "SELECT * FROM UserbaseWithPhone";
 
@@ -11,7 +12,7 @@ public class SqlNinja {
 
         try {
             // Load the MySQL JDBC driver
-            Class.forName("com.mysql.cj.jdbc.Driver");
+            Class.forName(jdbcUrl);
 
             // Establish the database connection
             Connection connection = DriverManager.getConnection(Credentials.SQL_URL, Credentials.SQL_USERNAME, Credentials.SQL_PASSWORD);
@@ -33,6 +34,36 @@ public class SqlNinja {
         }
         return resultSetFinal;
     }
-}
+
+    public void updateFirstEmail(int id) {
+
+        // SQL query to update the column
+        String sql = "UPDATE UserbaseWithPhone SET FirstEmail = ? WHERE id = ?";
+
+        try (Connection connection = DriverManager.getConnection(Credentials.SQL_URL, Credentials.SQL_USERNAME, Credentials.SQL_PASSWORD);
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            // Set the new value for FirstEmail column
+            boolean newValue = true;
+            statement.setBoolean(1, newValue);
+
+            // Set the ID of the row to update
+            statement.setInt(2, id);
+
+            // Execute the update query
+            int rowsAffected = statement.executeUpdate();
+
+            // Check if the update was successful
+            if (rowsAffected > 0) {
+                System.out.println("FirstEmail column updated successfully for ID: " + id);
+            } else {
+                System.out.println("No rows were updated.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    }
+
 
 
