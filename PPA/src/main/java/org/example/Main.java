@@ -1,8 +1,6 @@
 package org.example;
 
-
 import org.json.simple.parser.ParseException;
-
 
 import java.io.*;
 import java.sql.ResultSet;
@@ -28,16 +26,15 @@ public class Main {
                     String email = resultSet.getString("email");
                     String license = resultSet.getString("license");
                     Boolean firstEmail = resultSet.getBoolean("firstEmail");
-
-                    HashMap<String, String> carInfo;
+                    String phone = resultSet.getString("PhoneNumber");
 
                     System.out.println(license);
                     System.out.println(email);
+                    System.out.println(firstEmail);
 
-                    carInfo = connection.creator(license);
+                    HashMap<String, String> carInfo = connection.creator(license);
 
-
-//                    String message = messageComposer.carTowedMessage
+//                  String message = messageComposer.carTowedMessage
 //                            (name, carInfo.get("License"), carInfo.get("StorageLotAddress"), carInfo.get("StorageLocation")
 //                            ,carInfo.get("TowedDate"), carInfo.get("Phone"));
 
@@ -45,12 +42,14 @@ public class Main {
                             (name, "c", "d", "e"
                                     ,"f", "g");
 
-                    if (firstEmail = false) {
-                        //send sign up email String signup = messageComposer.signUpEmali();
-                        //emailSender.sendEmail(email, signup);
+                    if (firstEmail == false) {
+                        emailSender.sendEmail(email, "SIGN UP EMAIL");
+                        twilioSMS.sendMessage(phone, "SIGN UP TEXT");
+                        System.out.println("MESSAGE SENT TO" + phone);
                     }
 
                     if (email.equals("smrsmr0502@gmail.com")) {  //if (!carinfo = null))
                         System.out.println("HIT");
                         emailSender.sendEmail(email, fakeMessage);
+                        twilioSMS.sendMessage(phone, fakeMessage);
                         }}}}

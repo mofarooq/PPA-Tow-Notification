@@ -6,9 +6,6 @@ import javax.mail.internet.*;
 
 
 public class Email {
-    private String email;
-    private String message;
-
     public Email() {
 
     };
@@ -16,10 +13,10 @@ public class Email {
     public void sendEmail(String email, String message) {
 
         // Outgoing SMTP server properties
-        String host = "mail.ihatetheppa.com";
-        int port = 465;
-        String username = "mfarooq@ihatetheppa.com";
-        String password = "Mmfarooq1!";
+        String host = Credentials.EMAIL_HOST;
+        int port = Credentials.EMAIL_PORT;
+        String username = Credentials.EMAIL_USERNAME;
+        String password = Credentials.EMAIL_PASSWORD;
 
         // Sender and recipient details
         String from = "mfarooq@ihatetheppa.com";
@@ -61,8 +58,5 @@ public class Email {
             System.out.println("Email sent successfully!");
         } catch (MessagingException e) {
             e.printStackTrace();
-        }
-    }
-
-    }
+        }}}
 

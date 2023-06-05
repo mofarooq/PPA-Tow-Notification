@@ -2,16 +2,14 @@ package org.example;
 import java.sql.*;
 
 public class SqlNinja {
-
-
     public ResultSet userSet()  {
         // AWS RDS database connection parameters
-        String url = "jdbc:mysql://ppa-database-1.czkjwcsnqzk1.us-east-2.rds.amazonaws.com/PPA";
-        String username = "admin";
-        String password = "Mmfarooq1!";
+        String url = Credentials.SQL_URL;
+        String username = Credentials.SQL_USERNAME;
+        String password = Credentials.SQL_PASSWORD;
 
         // SQL query to execute
-        String query = "SELECT * FROM Userbase";
+        String query = "SELECT * FROM UserbaseWithPhone";
 
         ResultSet resultSetFinal = null;
 
@@ -30,24 +28,6 @@ public class SqlNinja {
 
             resultSetFinal = resultSet;
 
-            // Process the result set
-//            while (resultSet.next()) {
-//                // Retrieve data from the result set
-//                int id = resultSet.getInt("id");
-//                String name = resultSet.getString("name");
-//                String email = resultSet.getString("email");
-//                String license = resultSet.getString("license");
-//                String firstEmail = resultSet.getString("firstEmail");
-//
-//                // ... Retrieve other columns as needed
-//
-//                // Do something with the retrieved data
-//                System.out.println("ID: " + id + ", Name: " + name + ", Email: " + email+ ", License: " + license+ ", FirstEmailSent: " + firstEmail);
-//                System.out.println(resultSet);
-//
-//            }
-
-            // Close the result set, statement, and connection
 //            resultSet.close();
 //            statement.close();
 //            connection.close();
@@ -55,10 +35,8 @@ public class SqlNinja {
             e.printStackTrace();
 
         }
-
         return resultSetFinal;
     }
 }
 
 
-        // Database connection parameters
