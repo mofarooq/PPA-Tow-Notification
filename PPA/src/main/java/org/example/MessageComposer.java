@@ -25,4 +25,10 @@ public class MessageComposer {
             return message;
     }
 
+    public String signUpMessage(String name) {
+        String message = "Hey " + name + "! Thank you for signing up for PPA Tow Alerts. If your car ever gets towed, you will receive an email and a text with information on how to retrieve it.";
+        return message;
+
+    }
+
 }

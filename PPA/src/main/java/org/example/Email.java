@@ -48,7 +48,7 @@ public class Email {
             // Send the email
             Transport.send(mimeMessage);
 
-            System.out.println("Email sent successfully!");
+           // System.out.println("Email sent successfully!");
         } catch (MessagingException e) {
             e.printStackTrace();
         }}}

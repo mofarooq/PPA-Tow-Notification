@@ -1,5 +1,6 @@
 package org.example;
 
+import com.twilio.exception.ApiException;
 import org.json.simple.parser.ParseException;
 
 import java.io.*;
@@ -38,19 +39,21 @@ public class Main {
 //                            (name, carInfo.get("License"), carInfo.get("StorageLotAddress"), carInfo.get("StorageLocation")
 //                            ,carInfo.get("TowedDate"), carInfo.get("Phone"));
 
+                    String fakeSignUpMessage = messageComposer.signUpMessage(name);
+
                     String fakeMessage = messageComposer.carTowedMessage
-                            (name, "c", "d", "e"
-                                    ,"f", "g");
+                            (name, "BLUBBER", "Weenie Hut", "General"
+                                    ,"1/31/2023", "911");
 
                     if (firstEmail == false) {
-                        emailSender.sendEmail(email, "SIGN UP EMAIL");
-                        twilioSMS.sendMessage(phone, "SIGN UP TEXT");
-                        System.out.println("MESSAGE SENT TO" + phone);
+                        emailSender.sendEmail(email, fakeSignUpMessage);
+                        twilioSMS.sendMessage(phone, fakeSignUpMessage);
+                        System.out.println("SIGN UP MESSAGE TO " + phone + email);
                         sqlNinja.updateFirstEmail(id);
                     }
 
                     if (email.equals("smrsmr0502@gmail.com")) {  //if (!carinfo = null))
-                        System.out.println("HIT");
                         emailSender.sendEmail(email, fakeMessage);
                         twilioSMS.sendMessage(phone, fakeMessage);
+                        System.out.println("CAR TOWED MESSAGE TO " + phone + email);
                         }}}}
