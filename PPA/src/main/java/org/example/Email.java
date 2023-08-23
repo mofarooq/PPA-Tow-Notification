@@ -1,4 +1,5 @@
 package org.example;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Properties;
 import javax.mail.*;
@@ -19,6 +20,8 @@ public class Email {
              subject = "Your Car Has Been Towed!";
         }
 
+        String senderDisplayName = "PPA Tow Notifications";
+
         // Set the host and authentication properties
         Properties properties = new Properties();
         properties.put("mail.smtp.host", Credentials.EMAIL_HOST);
@@ -37,9 +40,13 @@ public class Email {
         try {
             // Create a MimeMessage object
             MimeMessage mimeMessage = new MimeMessage(session);
+            InternetAddress senderAddress = new InternetAddress(Credentials.EMAIL_USERNAME, senderDisplayName);
+
+
+
 
             // Set the sender, recipient, subject, and content
-            mimeMessage.setFrom(new InternetAddress(Credentials.EMAIL_USERNAME));
+            mimeMessage.setFrom(senderAddress);
             mimeMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(email));
             mimeMessage.setSubject(subject);
             mimeMessage.setText(message);
@@ -55,5 +62,8 @@ public class Email {
            // System.out.println("Email sent successfully!");
         } catch (MessagingException e) {
             e.printStackTrace();
-        }}}
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+    }}
 
