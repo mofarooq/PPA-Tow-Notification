@@ -9,14 +9,16 @@ public class Email {
     public Email() {
 
     };
-    public void sendEmail(String email, String message) {
+    public void sendEmail(String email, String message, boolean towed) {
 
-        // Sender and recipient details
+        // Sender details
         String from = "mfarooq@ihatetheppa.com";
-        String to = email;
 
-        // Email content
-        String subject = "Your Car Has Been Towed!";
+        String subject = "Thank You For Signing Up!";
+        // Email subject
+        if (towed) {
+             subject = "Your Car Has Been Towed!";
+        }
 
         // Set the host and authentication properties
         Properties properties = new Properties();
@@ -39,9 +41,12 @@ public class Email {
 
             // Set the sender, recipient, subject, and content
             mimeMessage.setFrom(new InternetAddress(from));
-            mimeMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
+            mimeMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(email));
             mimeMessage.setSubject(subject);
             mimeMessage.setText(message);
+
+
+            mimeMessage.setHeader("signUp", "Signed Up For Tow Notifications");
 
             session.setDebug(false);
 

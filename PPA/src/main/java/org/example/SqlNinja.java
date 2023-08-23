@@ -6,7 +6,7 @@ public class SqlNinja {
     public final String jdbcUrl = "com.mysql.cj.jdbc.Driver";
     public ResultSet userSet()  {
         // SQL query to execute
-        String query = "SELECT * FROM UserbaseWithPhone";
+        String query = "SELECT * FROM final_ppa_userbase";
 
         ResultSet resultSetFinal = null;
 
@@ -35,10 +35,14 @@ public class SqlNinja {
         return resultSetFinal;
     }
 
-    public void updateFirstEmail(int id) {
+    //add way to update towedEmail. This is just for sign up email. Then different cron job/docker container will reset towedEmail for all rows
+    //back to 0 every 24 hours
+    public void updateEmailSent(int id, String message) {
+        //message = signUpMessage for first email
+        //message = towedMessage for towed
 
         // SQL query to update the column
-        String sql = "UPDATE UserbaseWithPhone SET FirstEmail = ? WHERE id = ?";
+        String sql = "UPDATE final_ppa_userbase SET " + message + " = ? WHERE id = ?";
 
         try (Connection connection = DriverManager.getConnection(Credentials.SQL_URL, Credentials.SQL_USERNAME, Credentials.SQL_PASSWORD);
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -54,9 +58,11 @@ public class SqlNinja {
             int rowsAffected = statement.executeUpdate();
 
             // Check if the update was successful
-            if (rowsAffected > 0) {
-                System.out.println("FirstEmail column updated successfully for ID: " + id);
-            } else {
+            if (rowsAffected > 0 && message == "signUpMessage") {
+                System.out.println("signUpMessage column updated successfully for ID: " + id);
+            } else if (rowsAffected > 0 && message == "towedMessage") {
+                System.out.println("towedMessage column updated successfully for ID: " + id);
+            }else {
                 System.out.println("No rows were updated.");
             }
         } catch (SQLException e) {

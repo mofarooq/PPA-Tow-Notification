@@ -1,6 +1,5 @@
 package org.example;
 
-import com.twilio.exception.ApiException;
 import org.json.simple.parser.ParseException;
 
 import java.io.*;
@@ -23,37 +22,43 @@ public class Main {
                 while (resultSet.next()) {
                     // Retrieve data from the result set for each individual row in mySQL table
                     int id = resultSet.getInt("id");
-                    String name = resultSet.getString("name");
-                    String email = resultSet.getString("email");
-                    String license = resultSet.getString("license");
-                    Boolean firstEmail = resultSet.getBoolean("firstEmail");
-                    String phone = resultSet.getString("PhoneNumber");
+                    String name = resultSet.getString("Name");
+                    String email = resultSet.getString("Email");
+                    String license = resultSet.getString("License");
+                    Boolean signUpMessageSent = resultSet.getBoolean("signUpMessage");
+                    Boolean towedMessageSent = resultSet.getBoolean("towedMessage");
+                    String phone = resultSet.getString("phoneNumber");
 
                     System.out.println(license);
                     System.out.println(email);
-                    System.out.println(firstEmail);
+                    System.out.println(signUpMessageSent);
 
                     HashMap<String, String> carInfo = connection.creator(license);
 
-//                  String message = messageComposer.carTowedMessage
-//                            (name, carInfo.get("License"), carInfo.get("StorageLotAddress"), carInfo.get("StorageLocation")
-//                            ,carInfo.get("TowedDate"), carInfo.get("Phone"));
+                    String message = null;
+                    if ((carInfo!=null))  {
+                         message = messageComposer.carTowedMessage
+                            (name, carInfo.get("License"), carInfo.get("StorageLotAddress"), carInfo.get("StorageLocation")
+                            ,carInfo.get("TowedDate"), carInfo.get("Phone"));}
 
-                    String fakeSignUpMessage = messageComposer.signUpMessage(name);
+                    String signUpMessage = messageComposer.signUpMessage(name);
 
                     String fakeMessage = messageComposer.carTowedMessage
                             (name, "BLUBBER", "Weenie Hut", "General"
                                     ,"1/31/2023", "911");
 
-                    if (firstEmail == false) {
-                        emailSender.sendEmail(email, fakeSignUpMessage);
-                        twilioSMS.sendMessage(phone, fakeSignUpMessage);
-                        System.out.println("SIGN UP MESSAGE TO " + phone + email);
-                        sqlNinja.updateFirstEmail(id);
+                    if (signUpMessageSent == false) {
+                        emailSender.sendEmail(email, signUpMessage, false);
+                        twilioSMS.sendMessage(phone, signUpMessage);
+                        System.out.println("SIGN UP MESSAGE TO PHONE #" + phone + " and email " + email);
+                        sqlNinja.updateEmailSent(id, "signUpMessage");
                     }
 
-                    if (email.equals("smrsmr0502@gmail.com")) {  //if (!carinfo = null))
-                        emailSender.sendEmail(email, fakeMessage);
-                        twilioSMS.sendMessage(phone, fakeMessage);
+                    if (carInfo != null && towedMessageSent == false) {
+                        emailSender.sendEmail(email, message, true);
+                        twilioSMS.sendMessage(phone, message);
                         System.out.println("CAR TOWED MESSAGE TO " + phone + email);
-                        }}}}
+                        sqlNinja.updateEmailSent(id, "towedMessage");
+
+                     }}}}
+
