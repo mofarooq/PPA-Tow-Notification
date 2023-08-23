@@ -51,9 +51,6 @@ public class Email {
             mimeMessage.setSubject(subject);
             mimeMessage.setText(message);
 
-
-            mimeMessage.setHeader("signUp", "Signed Up For Tow Notifications");
-
             session.setDebug(false);
 
             // Send the email
