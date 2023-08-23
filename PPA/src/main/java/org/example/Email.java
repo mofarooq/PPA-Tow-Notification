@@ -12,7 +12,6 @@ public class Email {
     public void sendEmail(String email, String message, boolean towed) {
 
         // Sender details
-        String from = "mfarooq@ihatetheppa.com";
 
         String subject = "Thank You For Signing Up!";
         // Email subject
@@ -40,7 +39,7 @@ public class Email {
             MimeMessage mimeMessage = new MimeMessage(session);
 
             // Set the sender, recipient, subject, and content
-            mimeMessage.setFrom(new InternetAddress(from));
+            mimeMessage.setFrom(new InternetAddress(Credentials.EMAIL_USERNAME));
             mimeMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(email));
             mimeMessage.setSubject(subject);
             mimeMessage.setText(message);
