@@ -41,7 +41,7 @@ public class Main {
                             (name, carInfo.get("License"), carInfo.get("StorageLotAddress"), carInfo.get("StorageLocation")
                             ,carInfo.get("TowedDate"), carInfo.get("Phone"));}
 
-                    String signUpMessage = messageComposer.signUpMessage(name);
+                    String signUpMessage = messageComposer.signUpMessage(name, license);
 
                     String fakeMessage = messageComposer.carTowedMessage
                             (name, "BLUBBER", "Weenie Hut", "General"

@@ -22,7 +22,7 @@ import com.twilio.type.PhoneNumber;
 
                 System.out.println("Message sent successfully. SID: " + message.getSid());
             } catch (ApiException e) {
-                System.out.println("INVALID NUMBER");
+                System.out.println(e.toString());
             }
 
 
