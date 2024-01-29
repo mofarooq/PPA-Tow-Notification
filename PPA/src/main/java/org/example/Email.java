@@ -12,8 +12,6 @@ public class Email {
     };
     public void sendEmail(String email, String message, boolean towed) {
 
-        // Sender details
-
         String subject = "Thank You For Signing Up!";
         // Email subject
         if (towed) {

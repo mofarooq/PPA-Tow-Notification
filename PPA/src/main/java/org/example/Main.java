@@ -20,45 +20,42 @@ public class Main {
 
                 ResultSet resultSet = sqlNinja.userSet();
                 while (resultSet.next()) {
+
                     // Retrieve data from the result set for each individual row in mySQL table
                     int id = resultSet.getInt("id");
                     String name = resultSet.getString("Name");
                     String email = resultSet.getString("Email");
-                    String license = resultSet.getString("License");
+                    String license = resultSet.getString("License").replace("-", "").replace(" ","");
                     Boolean signUpMessageSent = resultSet.getBoolean("signUpMessage");
                     Boolean towedMessageSent = resultSet.getBoolean("towedMessage");
                     String phone = resultSet.getString("phoneNumber");
 
-                    System.out.println(license);
-                    System.out.println(email);
-                    System.out.println(signUpMessageSent);
+                    //Logging
+                    System.out.println("Checking " + name + " (" + email + ", " + phone + ")" + " with license "
+                    + license +". " + "Sign up Message sent: " + signUpMessageSent);
 
                     HashMap<String, String> carInfo = connection.creator(license);
 
-                    String message = null;
+                    String carTowedMessage = null;
                     if ((carInfo!=null))  {
-                         message = messageComposer.carTowedMessage
+                         carTowedMessage = messageComposer.carTowedMessage
                             (name, carInfo.get("License"), carInfo.get("StorageLotAddress"), carInfo.get("StorageLocation")
                             ,carInfo.get("TowedDate"), carInfo.get("Phone"));}
 
                     String signUpMessage = messageComposer.signUpMessage(name, license);
 
-                    String fakeMessage = messageComposer.carTowedMessage
-                            (name, "BLUBBER", "Weenie Hut", "General"
-                                    ,"1/31/2023", "911");
 
                     if (signUpMessageSent == false) {
                         emailSender.sendEmail(email, signUpMessage, false);
                         twilioSMS.sendMessage(phone, signUpMessage);
-                        System.out.println("SIGN UP MESSAGE TO PHONE #" + phone + " and email " + email);
+                        System.out.println("SIGN UP MESSAGE SENT TO " + name + "(" + phone + ", " + email + ")");
                         sqlNinja.updateEmailSent(id, "signUpMessage");
                     }
 
                     if (carInfo != null && towedMessageSent == false) {
-                        emailSender.sendEmail(email, message, true);
-                        twilioSMS.sendMessage(phone, message);
-                        System.out.println("CAR TOWED MESSAGE TO " + phone + email);
+                        emailSender.sendEmail(email, carTowedMessage, true);
+                        twilioSMS.sendMessage(phone, carTowedMessage);
+                        System.out.println("CAR TOWED MESSAGE SENT TO " + name + "(" + phone + ", " + email + ")");
                         sqlNinja.updateEmailSent(id, "towedMessage");
-
                      }}}}
 
